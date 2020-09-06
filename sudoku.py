@@ -31,16 +31,15 @@ class Sudoku:
             self.tmp[:, non_zero_index[i][0], non_zero_index[i][1]] = 0    
 
     def block_all(self):
-        # row
-        for r in list(np.arange(9)):
-            for v in self.result[r]:
+        for i in list(np.arange(9)):
+            # row
+            for v in self.result[i]:
                 if v != 0:
-                    self.tmp[v-1,r,:] = 0
-        # column
-        for c in list(np.arange(9)):
-            for v in self.result[:,c]:
+                    self.tmp[v-1,i,:] = 0
+            # column
+            for v in self.result[:,i]:
                 if v != 0:
-                    self.tmp[v-1,:,c] = 0
+                    self.tmp[v-1,:,i] = 0
         # box
         for a in list(np.arange(0, 7, 3)):
             for b in list(np.arange(0, 7, 3)):
@@ -52,14 +51,13 @@ class Sudoku:
         for n in list(np.arange(9)):
             num_tmp = self.tmp[n]
 
-            # row
-            for r in list(np.arange(9)):
-                if num_tmp[r][num_tmp[r] == 1].size == 1:
-                    self.result[r, np.where(num_tmp[r] == 1)[0][0]] = n+1
-            # column
-            for c in list(np.arange(9)):
-                if num_tmp[:,c][num_tmp[:,c] == 1].size == 1:
-                    self.result[np.where(num_tmp[:,c] == 1)[0][0], c] = n+1
+            for i in list(np.arange(9)):
+                # row
+                if num_tmp[i][num_tmp[i] == 1].size == 1:
+                    self.result[i, np.where(num_tmp[i] == 1)[0][0]] = n+1
+                # column
+                if num_tmp[:,i][num_tmp[:,i] == 1].size == 1:
+                    self.result[np.where(num_tmp[:,i] == 1)[0][0], i] = n+1
             # box
             for a in list(np.arange(0, 7, 3)):
                 for b in list(np.arange(0, 7, 3)):
