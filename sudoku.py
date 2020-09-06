@@ -33,19 +33,17 @@ class Sudoku:
     def block_all(self):
         for i in list(np.arange(9)):
             # row
-            for v in self.result[i]:
-                if v != 0:
-                    self.tmp[v-1,i,:] = 0
+            for v in self.result[i][self.result[i] != 0]:
+                self.tmp[v-1,i,:] = 0
             # column
-            for v in self.result[:,i]:
-                if v != 0:
-                    self.tmp[v-1,:,i] = 0
+            for v in self.result[:,i][self.result[:,i] != 0]:
+                self.tmp[v-1,:,i] = 0
         # box
         for a in list(np.arange(0, 7, 3)):
             for b in list(np.arange(0, 7, 3)):
-                for v in self.result[a:a+3, b:b+3].flatten():
-                    if v != 0:
-                        self.tmp[v-1,a:a+3, b:b+3] = 0
+                t_box_arr = self.result[a:a+3, b:b+3].flatten()
+                for v in t_box_arr[t_box_arr != 0]:
+                    self.tmp[v-1,a:a+3, b:b+3] = 0
 
     def put_all(self):
         for n in list(np.arange(9)):
