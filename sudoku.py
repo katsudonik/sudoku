@@ -3,7 +3,7 @@
 
 # # import library & define functions
 
-# In[1]:
+# In[61]:
 
 
 import pandas as pd
@@ -11,7 +11,7 @@ import numpy as np
 from copy import deepcopy
 
 
-# In[2]:
+# In[62]:
 
 
 class Sudoku:
@@ -85,6 +85,7 @@ class Sudoku:
             tmp_candidates = pd.DataFrame(np.where(self.tmp[i] != 0))
             for c_i in list(tmp_candidates.transpose().index):
                 self.result[ tmp_candidates[c_i][0], tmp_candidates[c_i][1]] = i+1
+                self.block_exist_place()
                 self.block_and_put()
         #         display(pd.DataFrame(result))
                 if self.result_zero_size() == 0:
@@ -101,7 +102,7 @@ class Sudoku:
             self.tmp_bk = deepcopy(self.tmp)
         else:
             print('complete!')
-#         self.display_result()
+        self.display_result()
         if self.result_zero_size() != 0:
             self.exploratory_calc()
             if self.result_zero_size() != 0:
@@ -123,19 +124,19 @@ class Sudoku:
 
 # # import data
 
-# In[3]:
+# In[63]:
 
 
 result = np.array([
-    [0,0,0,7,0,0,6,2,0],
-    [0,0,6,0,8,0,0,0,1],
-    [0,5,0,0,3,0,0,0,7],
-    [7,0,0,0,0,0,0,0,0],
-    [0,8,3,0,0,0,9,5,0],
-    [0,0,0,0,0,0,0,0,3],
-    [2,0,0,0,6,0,0,7,0],
-    [4,0,0,0,9,0,5,0,0],
-    [0,3,7,0,0,1,0,0,0],
+    [0,0,8,0,0,3,0,0,0],
+    [0,0,7,0,1,0,9,0,0],
+    [6,3,0,0,0,2,0,7,0],
+    [0,0,0,0,0,0,4,0,9],
+    [0,7,0,0,0,0,0,8,0],
+    [5,0,1,0,0,0,0,0,0],
+    [0,4,0,7,0,0,0,5,2],
+    [0,0,9,0,5,0,8,0,0],
+    [0,0,0,4,0,0,7,0,0],
 ])
 
 sudoku = Sudoku(result)
@@ -143,7 +144,7 @@ sudoku = Sudoku(result)
 
 # # calc
 
-# In[4]:
+# In[64]:
 
 
 sudoku.calc()
@@ -151,15 +152,29 @@ sudoku.calc()
 
 # # display result
 
-# In[5]:
+# In[65]:
 
 
 sudoku.display_result()
 
 
+# In[76]:
+
+
+for i in list(np.arange(9)):
+    if np.unique(sudoku.result[i]).size != 9:
+        raise Exception('anything is wrong!')
+    if np.unique(sudoku.result[:,i]).size != 9:
+        raise Exception('anything is wrong!')
+for a in list(np.arange(0, 7, 3)):
+    for b in list(np.arange(0, 7, 3)):
+        if np.unique(sudoku.result[a:a+3, b:b+3].flatten()).size != 9:
+            raise Exception('anything is wrong!')
+
+
 # # display remaining candidate 
 
-# In[6]:
+# In[66]:
 
 
 sudoku.display_remaining_candidate()
