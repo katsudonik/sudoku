@@ -3,7 +3,7 @@
 
 # # import library & define functions
 
-# In[61]:
+# In[1]:
 
 
 import pandas as pd
@@ -11,7 +11,7 @@ import numpy as np
 from copy import deepcopy
 
 
-# In[62]:
+# In[2]:
 
 
 class Sudoku:
@@ -109,6 +109,7 @@ class Sudoku:
                 print('unresolved size:', self.result_zero_size())
                 self.display_result()
             else:
+                self.check_result()
                 print('complete!')
     
     def display_result(self):
@@ -121,10 +122,25 @@ class Sudoku:
                 print('num:', i+1)
                 display(pd.DataFrame(self.tmp[i].astype(int)))
 
+    def raise_err(self):
+        self.display_result()
+        raise Exception('anything is wrong!')
+
+    def check_result(self):
+        for i in list(np.arange(9)):
+            if np.unique(self.result[i]).size != 9:
+                self.raise_err()
+            if np.unique(self.result[:,i]).size != 9:
+                self.raise_err()
+        for a in list(np.arange(0, 7, 3)):
+            for b in list(np.arange(0, 7, 3)):
+                if np.unique(self.result[a:a+3, b:b+3].flatten()).size != 9:
+                    self.raise_err()
+
 
 # # import data
 
-# In[63]:
+# In[3]:
 
 
 result = np.array([
@@ -144,7 +160,7 @@ sudoku = Sudoku(result)
 
 # # calc
 
-# In[64]:
+# In[4]:
 
 
 sudoku.calc()
@@ -152,29 +168,15 @@ sudoku.calc()
 
 # # display result
 
-# In[65]:
+# In[5]:
 
 
 sudoku.display_result()
 
 
-# In[76]:
-
-
-for i in list(np.arange(9)):
-    if np.unique(sudoku.result[i]).size != 9:
-        raise Exception('anything is wrong!')
-    if np.unique(sudoku.result[:,i]).size != 9:
-        raise Exception('anything is wrong!')
-for a in list(np.arange(0, 7, 3)):
-    for b in list(np.arange(0, 7, 3)):
-        if np.unique(sudoku.result[a:a+3, b:b+3].flatten()).size != 9:
-            raise Exception('anything is wrong!')
-
-
 # # display remaining candidate 
 
-# In[66]:
+# In[6]:
 
 
 sudoku.display_remaining_candidate()
