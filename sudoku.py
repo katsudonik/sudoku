@@ -3,7 +3,7 @@
 
 # # import library & define functions
 
-# In[1]:
+# In[80]:
 
 
 import pandas as pd
@@ -11,7 +11,7 @@ import numpy as np
 from copy import deepcopy
 
 
-# In[2]:
+# In[81]:
 
 
 class Sudoku:
@@ -71,6 +71,7 @@ class Sudoku:
             self.block_all()
             self.put_all()
             self.block_exist_place()
+            self.block_all()
             if self.result_zero_size() == before_size:
                 break
 
@@ -91,6 +92,10 @@ class Sudoku:
                 if self.result_zero_size() == 0:
                     break
                 print('unresolved size:', self.result_zero_size())
+                self.display_result()
+                print('other candidate is nothing?: ', np.count_nonzero(self.tmp.flatten() != 0) == 0)
+                if np.count_nonzero(self.tmp.flatten() != 0) != 0:
+                    self.exploratory_calc()
                 self.result = deepcopy(self.result_bk)
                 self.tmp = deepcopy(self.tmp_bk)
 
@@ -140,7 +145,7 @@ class Sudoku:
 
 # # import data
 
-# In[3]:
+# In[82]:
 
 
 result = np.array([
@@ -160,7 +165,7 @@ sudoku = Sudoku(result)
 
 # # calc
 
-# In[4]:
+# In[83]:
 
 
 sudoku.calc()
@@ -168,7 +173,7 @@ sudoku.calc()
 
 # # display result
 
-# In[5]:
+# In[84]:
 
 
 sudoku.display_result()
@@ -176,7 +181,7 @@ sudoku.display_result()
 
 # # display remaining candidate 
 
-# In[6]:
+# In[85]:
 
 
 sudoku.display_remaining_candidate()
