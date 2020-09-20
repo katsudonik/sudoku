@@ -138,36 +138,3 @@ class Sudoku:
                 if np.unique(self.result[a:a+3, b:b+3].flatten()).size != 9:
                     self.raise_err()
 
-
-# # import data
-
-# In[3]:
-
-
-result = np.loadtxt('input_data/test_1.csv', delimiter=',', dtype='int64')
-sudoku = Sudoku(result)
-
-
-# # calc
-
-# In[4]:
-
-
-sudoku.calc()
-
-
-# # display result
-
-# In[5]:
-
-
-sudoku.display_result()
-
-
-# # display remaining candidate 
-
-# In[6]:
-
-
-sudoku.display_remaining_candidate()
-
