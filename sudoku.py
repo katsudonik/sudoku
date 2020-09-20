@@ -71,6 +71,7 @@ class Sudoku:
             self.block_all()
             self.put_all()
             self.block_exist_place()
+            self.block_all()
             if self.result_zero_size() == before_size:
                 break
 
