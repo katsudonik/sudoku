@@ -3,7 +3,7 @@
 
 # # import library & define functions
 
-# In[80]:
+# In[1]:
 
 
 import pandas as pd
@@ -11,7 +11,7 @@ import numpy as np
 from copy import deepcopy
 
 
-# In[81]:
+# In[2]:
 
 
 class Sudoku:
@@ -21,6 +21,8 @@ class Sudoku:
         self.block_exist_place()
         print('imported data:', 'null size:', self.result_zero_size())
         self.display_result()
+        self.recursion_cnt = 0
+        self.exploring_num = 0
         
     def result_zero_size(self):
         return np.count_nonzero(self.result.flatten() == 0)
@@ -33,10 +35,10 @@ class Sudoku:
     def block_all(self):
         for i in list(np.arange(9)):
             # row
-            for v in self.result[i][self.result[i] != 0]:
+            for v in self.result[i][self.result[i] != 0]: #1
                 self.tmp[v-1,i,:] = 0
             # column
-            for v in self.result[:,i][self.result[:,i] != 0]:
+            for v in self.result[:,i][self.result[:,i] != 0]: #2: TODO 1と2の投稿
                 self.tmp[v-1,:,i] = 0
         # box
         for a in list(np.arange(0, 7, 3)):
@@ -85,30 +87,49 @@ class Sudoku:
         #     print('define i:', i)
             tmp_candidates = pd.DataFrame(np.where(self.tmp[i] != 0))
             for c_i in list(tmp_candidates.transpose().index):
+                if self.recursion_cnt == 0:
+                    self.exploring_num += 1
+                    print(self.exploring_num, '/', self.total_candidate_size)
                 self.result[ tmp_candidates[c_i][0], tmp_candidates[c_i][1]] = i+1
                 self.block_exist_place()
                 self.block_and_put()
         #         display(pd.DataFrame(result))
                 if self.result_zero_size() == 0:
                     break
-                print('unresolved size:', self.result_zero_size())
-                self.display_result()
-                print('other candidate is nothing?: ', np.count_nonzero(self.tmp.flatten() != 0) == 0)
+#                 print('unresolved size:', self.result_zero_size())
+#                 self.display_result()
+#                 print('recurse?: ', np.count_nonzero(self.tmp.flatten() != 0) != 0)
                 if np.count_nonzero(self.tmp.flatten() != 0) != 0:
+                    self.recursion_cnt+=1
+                    
+                    #update savepoint
+                    if len(self.result_bk) <= self.recursion_cnt:
+                        self.result_bk.append(deepcopy(self.result))
+                        self.tmp_bk.append(deepcopy(self.tmp))
+                    else:
+                        self.result_bk[self.recursion_cnt] = deepcopy(self.result)
+                        self.tmp_bk[self.recursion_cnt] = deepcopy(self.tmp)
+                        
+                    print('recursion_cnt: ', self.recursion_cnt)
                     self.exploratory_calc()
-                self.result = deepcopy(self.result_bk)
-                self.tmp = deepcopy(self.tmp_bk)
+                if self.result_zero_size() == 0:
+                    break
+                self.result = deepcopy(self.result_bk[self.recursion_cnt])
+                self.tmp = deepcopy(self.tmp_bk[self.recursion_cnt])
+        self.recursion_cnt-=1
 
     def calc(self):
         self.block_and_put()
-        if self.result_zero_size() != 0:
-#             print('unresolved size:', self.result_zero_size())
-            self.result_bk = deepcopy(self.result)
-            self.tmp_bk = deepcopy(self.tmp)
-        else:
-            print('complete!')
         self.display_result()
-        if self.result_zero_size() != 0:
+        if self.result_zero_size() == 0:
+            self.check_result()
+            print('complete!')
+        else:
+#             print('unresolved size:', self.result_zero_size())
+            self.result_bk = [deepcopy(self.result)]
+            self.tmp_bk = [deepcopy(self.tmp)]
+            self.total_candidate_size = pd.DataFrame(np.where(self.tmp != 0)).transpose().index.size
+            print('total candidate size: ', self.total_candidate_size)
             self.exploratory_calc()
             if self.result_zero_size() != 0:
                 print('unresolved size:', self.result_zero_size())
@@ -145,19 +166,19 @@ class Sudoku:
 
 # # import data
 
-# In[82]:
+# In[3]:
 
 
 result = np.array([
-    [0,0,8,0,0,3,0,0,0],
-    [0,0,7,0,1,0,9,0,0],
-    [6,3,0,0,0,2,0,7,0],
-    [0,0,0,0,0,0,4,0,9],
-    [0,7,0,0,0,0,0,8,0],
-    [5,0,1,0,0,0,0,0,0],
-    [0,4,0,7,0,0,0,5,2],
-    [0,0,9,0,5,0,8,0,0],
-    [0,0,0,4,0,0,7,0,0],
+    [7,0,0,0,0,0,0,0,0],
+    [0,0,6,0,1,0,0,8,0],
+    [0,0,0,0,0,0,0,2,0],
+    [0,0,0,5,0,0,3,0,0],
+    [0,0,8,0,0,0,0,0,0],
+    [0,0,1,0,2,0,0,0,0],
+    [0,0,0,0,8,0,0,0,0],
+    [5,9,0,0,6,0,7,0,0],
+    [3,0,0,0,0,0,5,0,0],
 ])
 
 sudoku = Sudoku(result)
@@ -165,7 +186,7 @@ sudoku = Sudoku(result)
 
 # # calc
 
-# In[83]:
+# In[4]:
 
 
 sudoku.calc()
@@ -173,7 +194,7 @@ sudoku.calc()
 
 # # display result
 
-# In[84]:
+# In[ ]:
 
 
 sudoku.display_result()
@@ -181,7 +202,7 @@ sudoku.display_result()
 
 # # display remaining candidate 
 
-# In[85]:
+# In[ ]:
 
 
 sudoku.display_remaining_candidate()
