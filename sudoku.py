@@ -62,7 +62,7 @@ class Sudoku:
         self.tmp[v-1,a:a+3, b:b+3] = 0
 #         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
 
-    def put_in_fixed_places(self:)
+    def put_in_fixed_places(self):
         for n in list(np.arange(9)):
             num_tmp = self.tmp[n]
 
@@ -119,7 +119,7 @@ class Sudoku:
         
     def calc(self):
         self.repeat_put_in_fixed_places()
-        self.display_result()
+#         self.display_result()
         if self.result_zero_size() == 0:
             self.check_result()
             print('complete!')
