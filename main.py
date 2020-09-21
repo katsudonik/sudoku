@@ -18,7 +18,7 @@ importlib.reload(sudoku)
 # In[2]:
 
 
-result = np.loadtxt('input_data/test_2.csv', delimiter=',', dtype='int64')
+result = np.loadtxt('input_data/test_1.csv', delimiter=',', dtype='int64')
 sudoku = sudoku.Sudoku(result)
 
 
@@ -46,13 +46,13 @@ sudoku.calc()
 # sudoku.display_remaining_candidate()
 
 
-# In[ ]:
+# In[6]:
 
 
 sudoku.exploratory_calc()
 
 
-# In[ ]:
+# In[7]:
 
 
 if sudoku.result_zero_size() == 0:
@@ -63,14 +63,8 @@ else:
     sudoku.display_result()
 
 
-# In[ ]:
+# In[10]:
 
 
-# np.sort(sudoku.result, axis=1)
-
-
-# In[ ]:
-
-
-# np.sort(sudoku.result, axis=0)
+sudoku.display_result()
 
