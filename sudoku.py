@@ -83,13 +83,10 @@ class Sudoku:
         self.tmp[v-1,a:a+3, b:b+3] = 0
         ## other box
         self.block_other_box(a, b)
-        
-#         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
 
     def put_in_fixed_places(self):
         for n in list(np.arange(9)):
             num_tmp = self.tmp[n]
-
             for i in list(np.arange(9)):
                 # row
                 if num_tmp[i].sum() == 1:
@@ -106,7 +103,6 @@ class Sudoku:
 
     def repeat_put_in_fixed_places(self):
         while self.result_zero_size() != 0:
-#             print('.')
             before_size = self.result_zero_size()
             self.put_in_fixed_places()
             if self.result_zero_size() == before_size:
@@ -121,7 +117,6 @@ class Sudoku:
             for v in candidate_values:
                 self.put(min_size_indexes[i][0], min_size_indexes[i][1], v)
                 self.repeat_put_in_fixed_places()
-#                 self.check_result_duplicate()
                 if self.result_zero_size() == 0:
                     return True
                 if np.count_nonzero(self.tmp.flatten() != 0) != 0:
@@ -143,7 +138,6 @@ class Sudoku:
         
     def calc(self):
         self.repeat_put_in_fixed_places()
-#         self.display_result()
         if self.result_zero_size() == 0:
             self.check_result()
             print('complete!')
@@ -151,9 +145,9 @@ class Sudoku:
 #             print('unresolved size:', self.result_zero_size())
             self.result_bk = [deepcopy(self.result)]
             self.tmp_bk = [deepcopy(self.tmp)]
-            self.total_candidate_size = pd.DataFrame(np.where(self.tmp != 0)).transpose().index.size
-            print('total candidate size: ', self.total_candidate_size)
-#             self.exploratory_calc() # test
+#             self.total_candidate_size = pd.DataFrame(np.where(self.tmp != 0)).transpose().index.size
+#             print('total candidate size: ', self.total_candidate_size)
+            self.exploratory_calc()
             if self.result_zero_size() == 0:
                 self.check_result()
                 print('complete!')
