@@ -3,7 +3,7 @@
 
 # # import library & define functions
 
-# In[1]:
+# In[3]:
 
 
 import pandas as pd
@@ -18,7 +18,6 @@ class Sudoku:
     def __init__(self, initial_data):
         self.result = initial_data
         self.tmp =  np.repeat(np.ones((9, 9))[:, :, np.newaxis], 9, axis=2)
-        self.block_exist_place()
         self.block_all()
         print('imported data:', 'null size:', self.result_zero_size())
         self.display_result()
@@ -28,18 +27,12 @@ class Sudoku:
     def result_zero_size(self):
         return np.count_nonzero(self.result.flatten() == 0)
     
-    def block_exist_place(self):
+    def block_all(self):
+        # exist place
         non_zero_index = pd.DataFrame(np.where(self.result != 0))
         for i in list(non_zero_index.transpose().index):
             self.tmp[:, non_zero_index[i][0], non_zero_index[i][1]] = 0    
-
-    def put_in_result(self, r, c, v):
-        self.result[r, c] = v
-        self.block_exist_place()
-        self.block_all()
-#         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
-    
-    def block_all(self):
+        
         for i in list(np.arange(9)):
             # row
             for v in self.result[i][self.result[i] != 0]:
@@ -53,30 +46,45 @@ class Sudoku:
                 t_box_arr = self.result[a:a+3, b:b+3].flatten()
                 for v in t_box_arr[t_box_arr != 0]:
                     self.tmp[v-1,a:a+3, b:b+3] = 0
+            
+    def put(self, r, c, v):
+        self.result[r, c] = v
+        # block
+        ## exist place
+        self.tmp[:, r, c] = 0
+        ## row
+        self.tmp[v-1,r,:] = 0
+        ## column
+        self.tmp[v-1,:,c] = 0
+        ## box
+        a = list(np.arange(0, 7, 3))[int(r/3)]
+        b = list(np.arange(0, 7, 3))[int(c/3)]
+        self.tmp[v-1,a:a+3, b:b+3] = 0
+#         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
 
-    def put_all(self):
+    def put_in_fixed_places(self:)
         for n in list(np.arange(9)):
             num_tmp = self.tmp[n]
 
             for i in list(np.arange(9)):
                 # row
                 if num_tmp[i].sum() == 1:
-                    self.put_in_result(i, np.where(num_tmp[i] == 1)[0][0], n+1)
+                    self.put(i, np.where(num_tmp[i] == 1)[0][0], n+1)
                 # column
                 if num_tmp[:,i].sum() == 1:
-                    self.put_in_result(np.where(num_tmp[:,i] == 1)[0][0], i, n+1)
+                    self.put(np.where(num_tmp[:,i] == 1)[0][0], i, n+1)
             # box
             for a in list(np.arange(0, 7, 3)):
                 for b in list(np.arange(0, 7, 3)):
                     t_box = num_tmp[a:a+3, b:b+3]
                     if t_box.flatten().sum() == 1:
-                        self.put_in_result(a + np.where(t_box == 1)[0][0], b + np.where(t_box == 1)[1][0], n+1)
+                        self.put(a + np.where(t_box == 1)[0][0], b + np.where(t_box == 1)[1][0], n+1)
 
-    def block_and_put(self):
+    def repeat_put_in_fixed_places(self):
         while self.result_zero_size() != 0:
+#             print('.')
             before_size = self.result_zero_size()
-            print('.')
-            self.put_all()
+            self.put_in_fixed_places()
             if self.result_zero_size() == before_size:
                 break
 
@@ -87,11 +95,9 @@ class Sudoku:
         for i in list(min_size_indexes.transpose().index):
             candidate_values = list(np.where(self.tmp[:, min_size_indexes[i][0], min_size_indexes[i][1]] == 1)[0] + 1)
             for v in candidate_values:
-                self.put_in_result(min_size_indexes[i][0], min_size_indexes[i][1], v)
-                self.block_and_put()
-                
-                self.check_result_duplicate()
-                
+                self.put(min_size_indexes[i][0], min_size_indexes[i][1], v)
+                self.repeat_put_in_fixed_places()
+#                 self.check_result_duplicate()
                 if self.result_zero_size() == 0:
                     return True
                 if np.count_nonzero(self.tmp.flatten() != 0) != 0:
@@ -112,7 +118,7 @@ class Sudoku:
         return False  
         
     def calc(self):
-        self.block_and_put()
+        self.repeat_put_in_fixed_places()
         self.display_result()
         if self.result_zero_size() == 0:
             self.check_result()
@@ -123,7 +129,7 @@ class Sudoku:
             self.tmp_bk = [deepcopy(self.tmp)]
             self.total_candidate_size = pd.DataFrame(np.where(self.tmp != 0)).transpose().index.size
             print('total candidate size: ', self.total_candidate_size)
-#             self.exploratory_calc()
+#             self.exploratory_calc() # test
             if self.result_zero_size() == 0:
                 self.check_result()
                 print('complete!')
@@ -178,10 +184,4 @@ class Sudoku:
 
     def display_by_color(self, df, subset):
         display( df.style.background_gradient(cmap='winter', subset=subset) )
-
-
-# In[ ]:
-
-
-
 
