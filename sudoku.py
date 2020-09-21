@@ -49,24 +49,6 @@ class Sudoku:
                     self.tmp[v-1,a:a+3, b:b+3] = 0
                 ## other box
                 self.block_other_box(a, b)
-                    
-    def put(self, r, c, v):
-        self.result[r, c] = v
-        # block
-        ## exist place
-        self.tmp[:, r, c] = 0
-        ## row
-        self.tmp[v-1,r,:] = 0
-        ## column
-        self.tmp[v-1,:,c] = 0
-        ## box
-        a = list(np.arange(0, 7, 3))[int(r/3)]
-        b = list(np.arange(0, 7, 3))[int(c/3)]
-        self.tmp[v-1,a:a+3, b:b+3] = 0
-        ## other box
-        self.block_other_box(a, b)
-        
-#         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
 
     def block_other_box(self, a, b):
         k = np.arange(0, 7, 3)
@@ -85,6 +67,24 @@ class Sudoku:
                 block_c = b + c_candidates[0]
                 for t_a in k[k != a]:
                     self.tmp[n, t_a:t_a+3, block_c] = 0
+
+    def put(self, r, c, v):
+        self.result[r, c] = v
+        # block
+        ## exist place
+        self.tmp[:, r, c] = 0
+        ## row
+        self.tmp[v-1,r,:] = 0
+        ## column
+        self.tmp[v-1,:,c] = 0
+        ## box
+        a = list(np.arange(0, 7, 3))[int(r/3)]
+        b = list(np.arange(0, 7, 3))[int(c/3)]
+        self.tmp[v-1,a:a+3, b:b+3] = 0
+        ## other box
+        self.block_other_box(a, b)
+        
+#         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
 
     def put_in_fixed_places(self):
         for n in list(np.arange(9)):
