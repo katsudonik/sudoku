@@ -43,10 +43,13 @@ class Sudoku:
         # box
         for a in list(np.arange(0, 7, 3)):
             for b in list(np.arange(0, 7, 3)):
+                ## this box
                 t_box_arr = self.result[a:a+3, b:b+3].flatten()
                 for v in t_box_arr[t_box_arr != 0]:
                     self.tmp[v-1,a:a+3, b:b+3] = 0
-            
+                ## other box
+                self.block_other_box(a, b)
+                    
     def put(self, r, c, v):
         self.result[r, c] = v
         # block
@@ -60,7 +63,28 @@ class Sudoku:
         a = list(np.arange(0, 7, 3))[int(r/3)]
         b = list(np.arange(0, 7, 3))[int(c/3)]
         self.tmp[v-1,a:a+3, b:b+3] = 0
+        ## other box
+        self.block_other_box(a, b)
+        
 #         self.display_by_color(pd.DataFrame(self.result), pd.IndexSlice[r:r, c:c])
+
+    def block_other_box(self, a, b):
+        k = np.arange(0, 7, 3)
+        for n in list(np.arange(9)):
+            num_tmp = self.tmp[n]
+            t_box = num_tmp[a:a+3, b:b+3]
+            # block other box's row
+            r_candidates = np.where(np.sum(t_box, axis=1) != 0)[0]
+            if r_candidates.size == 1:
+                block_r = a + r_candidates[0]
+                for t_b in k[k != b]:
+                    self.tmp[n, block_r, t_b:t_b+3] = 0
+            # block other box's column
+            c_candidates = np.where(np.sum(t_box, axis=0) != 0)[0]
+            if c_candidates.size == 1:
+                block_c = b + c_candidates[0]
+                for t_a in k[k != a]:
+                    self.tmp[n, t_a:t_a+3, block_c] = 0
 
     def put_in_fixed_places(self):
         for n in list(np.arange(9)):
