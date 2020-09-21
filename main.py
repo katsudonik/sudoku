@@ -18,7 +18,7 @@ importlib.reload(sudoku)
 # In[2]:
 
 
-result = np.loadtxt('input_data/test_1.csv', delimiter=',', dtype='int64')
+result = np.loadtxt('input_data/test_2.csv', delimiter=',', dtype='int64')
 sudoku = sudoku.Sudoku(result)
 
 
@@ -38,16 +38,10 @@ sudoku.calc()
 sudoku.display_result()
 
 
-# # display remaining candidate 
+# # display remaining candidate (if failed)
 
 # In[5]:
 
 
 sudoku.display_remaining_candidate()
-
-
-# In[ ]:
-
-
-
 
