@@ -141,7 +141,7 @@ class Sudoku:
     # debug functions:
     
     def display_result(self):
-        display( pd.DataFrame(self.result).style.background_gradient(cmap='winter') )
+        display( pd.DataFrame( np.where(self.result == 0, None, self.result) ).style.highlight_null(null_color='red') )
     
     def display_remaining_candidate(self):
         for i in np.arange(9):
