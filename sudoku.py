@@ -48,9 +48,9 @@ class Sudoku:
                 for v in t_box_arr[t_box_arr != 0]:
                     self.tmp[v-1,a:a+3, b:b+3] = 0
                 ## other box
-                self.block_other_box(a, b)
+                self.block_box_by_tmp(a, b)
 
-    def block_other_box(self, a, b):
+    def block_box_by_tmp(self, a, b): # TODO retest
         r_cands_v = [[],[],[]] # (for block this box)
         c_cands_v = [[],[],[]] # (for block this box)
         n_arr = np.arange(9)
@@ -104,7 +104,7 @@ class Sudoku:
         b = list(np.arange(0, 7, 3))[int(c/3)]
         self.tmp[v-1,a:a+3, b:b+3] = 0
         ## other box
-        self.block_other_box(a, b)
+        self.block_box_by_tmp(a, b)
 
     def put_in_fixed_places(self):
         for n in list(np.arange(9)):
