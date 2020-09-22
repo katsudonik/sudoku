@@ -59,32 +59,32 @@ class Sudoku:
             num_tmp = self.tmp[n]
             t_box = num_tmp[a:a+3, b:b+3]
             # block other box's row
-            r_candidates = np.where(np.sum(t_box, axis=1) != 0)[0]
-            if r_candidates.size == 1:
+            _sum = np.sum(t_box, axis=1)
+            r_candidates = np.where(_sum != 0)[0]
+            if (r_candidates.size == 1) and (_sum[r_candidates[0]] >= 2):
                 block_r = a + r_candidates[0]
                 for t_b in k[k != b]:
                     self.tmp[n, block_r, t_b:t_b+3] = 0
                 r_cands_v[r_candidates[0]].append(n)
             # block other box's column
-            c_candidates = np.where(np.sum(t_box, axis=0) != 0)[0]
-            if c_candidates.size == 1:
+            _sum = np.sum(t_box, axis=0)
+            c_candidates = np.where(_sum != 0)[0]
+            if (c_candidates.size == 1) and (_sum[c_candidates[0]] >= 2):
                 block_c = b + c_candidates[0]
                 for t_a in k[k != a]:
                     self.tmp[n, t_a:t_a+3, block_c] = 0
                 c_cands_v[c_candidates[0]].append(n)
 
-        # block this box
+        # block this box (technic 4)
         for i in list(range(3)):
             ## block this box's row
             res_box_r = self.result[a+i, b:b+3]
-            if res_box_r[res_box_r == 0].size == len(r_cands_v[i]):
-                for n in n_arr[~np.isin(n_arr, r_cands_v[i])]:
-                    self.tmp[n, a+i, b:b+3] = 0
+            if (len(r_cands_v[i]) >= 2) and (len(r_cands_v[i]) == res_box_r[res_box_r == 0].size):
+                self.tmp[n_arr[~np.isin(n_arr, r_cands_v[i])], a+i, b:b+3] = 0
             ## block this box's column
             res_box_c = self.result[a:a+3, b+i]
-            if res_box_c[res_box_c == 0].size == len(c_cands_v[i]):
-                for n in n_arr[~np.isin(n_arr, c_cands_v[i])]:
-                    self.tmp[n, a:a+3, b+i] = 0
+            if (len(c_cands_v[i]) >= 2) and (len(c_cands_v[i]) == res_box_c[res_box_c == 0].size):
+                self.tmp[n_arr[~np.isin(n_arr, c_cands_v[i])], a:a+3, b+i] = 0
 
     def put(self, r, c, v):
         self.result[r, c] = v
@@ -119,7 +119,7 @@ class Sudoku:
                     if t_box.flatten().sum() == 1:
                         self.put(a + np.where(t_box == 1)[0][0], b + np.where(t_box == 1)[1][0], n+1)
                         
-        # candidate size: 1 (tecknick 2)
+        # candidate size: 1 (technic 2)
         candidate_size_map = np.sum(self.tmp, axis=0)
         candidate_one_indexes = pd.DataFrame(np.where(candidate_size_map == 1))
         if len(candidate_one_indexes.transpose().index) >= 1:
