@@ -51,13 +51,16 @@ class Sudoku:
                 self.block_other_box(a, b)
 
     def block_other_box(self, a, b):
-        r_cands_v = [[],[],[]]
-        c_cands_v = [[],[],[]]
-        k = np.arange(0, 7, 3)
+        r_cands_v = [[],[],[]] # (for block this box)
+        c_cands_v = [[],[],[]] # (for block this box)
         n_arr = np.arange(9)
+        
+        # block other box
+        k = np.arange(0, 7, 3)
         for n in list(n_arr):
             num_tmp = self.tmp[n]
             t_box = num_tmp[a:a+3, b:b+3]
+            
             # block other box's row
             _sum = np.sum(t_box, axis=1)
             r_candidates = np.where(_sum != 0)[0]
@@ -65,7 +68,8 @@ class Sudoku:
                 block_r = a + r_candidates[0]
                 for t_b in k[k != b]:
                     self.tmp[n, block_r, t_b:t_b+3] = 0
-                r_cands_v[r_candidates[0]].append(n)
+                r_cands_v[r_candidates[0]].append(n) # (for block this box)
+                
             # block other box's column
             _sum = np.sum(t_box, axis=0)
             c_candidates = np.where(_sum != 0)[0]
@@ -73,7 +77,7 @@ class Sudoku:
                 block_c = b + c_candidates[0]
                 for t_a in k[k != a]:
                     self.tmp[n, t_a:t_a+3, block_c] = 0
-                c_cands_v[c_candidates[0]].append(n)
+                c_cands_v[c_candidates[0]].append(n) # (for block this box)
 
         # block this box (technic 4)
         for i in list(range(3)):
