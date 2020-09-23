@@ -47,7 +47,7 @@ class Sudoku:
                 ## other box
                 self.block_box_by_tmp(a, b)
 
-    def block_box_by_tmp(self, a, b): # TODO retest
+    def block_box_by_tmp(self, a, b):
         r_cands_v = [[],[],[]] # (for block this box)
         c_cands_v = [[],[],[]] # (for block this box)
         n_arr = np.arange(9)
