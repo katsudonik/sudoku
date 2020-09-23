@@ -134,8 +134,58 @@ class Sudoku:
             self.put_in_fixed_places()
             if self.result_zero_size() == before_size:
                 break
+    
+    def empty_rectangle(self): # TODO test
+        while self.result_zero_size() != 0:
+            before_zero_size = self.result_zero_size()
+            list_n_sorted_by_cand_size = list(pd.DataFrame(
+                list(map(lambda n: self.tmp[n].sum(), list(np.arange(9))))).sort_values(0).index)
+            for n in list_n_sorted_by_cand_size:
+                result_bk = deepcopy(self.result)
+                tmp_bk = deepcopy(self.tmp)
 
-    def exploratory_calc(self):
+                print("before", n)
+                self.display_result()
+                cand_indexes = pd.DataFrame(np.where(self.tmp[n] == 1))
+                print('cand_indexes:')
+                display(cand_indexes)
+
+                ## tmporary put (candidate:0)
+                self.put(cand_indexes[0][0], cand_indexes[0][1], n+1)
+                self.repeat_put_in_fixed_places()
+                if self.result_zero_size() == 0:
+                    return True
+                dup_res = deepcopy(self.result)
+                ### rollback
+                self.result = deepcopy(result_bk)
+                self.tmp = deepcopy(tmp_bk)
+                print('dup_res 0:')
+                display(dup_res)
+
+                ## tmporary put (candidate: > 0) & update dup_res
+                for i in list(cand_indexes.transpose().index)[1:]:
+                    self.put(cand_indexes[i][0], cand_indexes[i][1], n+1)
+                    self.repeat_put_in_fixed_places()
+                    if self.result_zero_size() == 0:
+                        return True
+                    print('result', i)
+                    display(self.result)
+                    ### update
+                    dup_res[~(dup_res == self.result)] = 0
+                    ### rollback
+                    self.result = deepcopy(result_bk)
+                    self.tmp = deepcopy(tmp_bk)
+                    print('dup_res > 0:')
+                    display(dup_res)
+                self.result = dup_res
+                self.block_all()
+                print("after", n)
+                self.display_result()
+                self.repeat_put_in_fixed_places()
+            if self.result_zero_size() == before_zero_size:
+                break
+
+    def exploratory_calc(self): # TODO use empty_rectangle?
         candidate_size_map = np.sum(self.tmp, axis=0)
         min_size = candidate_size_map[candidate_size_map != 0].min()
         min_size_indexes = pd.DataFrame(np.where(candidate_size_map == min_size))
@@ -168,25 +218,27 @@ class Sudoku:
         if self.result_zero_size() == 0:
             self.check_result()
             print('complete!')
-        else:
-#             print('unresolved size:', self.result_zero_size())
-            self.result_bk = [deepcopy(self.result)]
-            self.tmp_bk = [deepcopy(self.tmp)]
-#             self.total_candidate_size = pd.DataFrame(np.where(self.tmp != 0)).transpose().index.size
-#             print('total candidate size: ', self.total_candidate_size)
-            self.exploratory_calc()
-            if self.result_zero_size() == 0:
-                self.check_result()
-                print('complete!')
-            else:
-                print('unresolved size:', self.result_zero_size())
-                self.display_result()
-
+            return True
+        self.empty_rectangle()
+        if self.result_zero_size() == 0:
+            self.check_result()
+            print('complete!')
+            return True
+        self.result_bk = [deepcopy(self.result)]
+        self.tmp_bk = [deepcopy(self.tmp)]
+        self.exploratory_calc()
+        if self.result_zero_size() == 0:
+            self.check_result()
+            print('complete!')
+            return True
+        self.display_result()
+        return False
                 
     # debug functions:
     
     def display_result(self):
         display( pd.DataFrame( np.where(self.result == 0, None, self.result) ).style.highlight_null(null_color='red') )
+        print('unresolved size:', self.result_zero_size())
     
     def display_remaining_candidate(self):
         for i in np.arange(9):
