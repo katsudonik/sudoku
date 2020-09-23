@@ -26,7 +26,7 @@ class Sudoku:
         
     def result_zero_size(self):
         return np.count_nonzero(self.result.flatten() == 0)
-    
+
     def block_all(self):
         # exist place
         non_zero_index = pd.DataFrame(np.where(self.result != 0))
@@ -35,18 +35,15 @@ class Sudoku:
         
         for i in list(np.arange(9)):
             # row
-            for v in self.result[i][self.result[i] != 0]:
-                self.tmp[v-1,i,:] = 0
+            self.tmp[list(self.result[i][self.result[i] != 0] - 1),i,:] = 0
             # column
-            for v in self.result[:,i][self.result[:,i] != 0]:
-                self.tmp[v-1,:,i] = 0
+            self.tmp[list(self.result[:,i][self.result[:,i] != 0] - 1),:,i] = 0
         # box
         for a in list(np.arange(0, 7, 3)):
             for b in list(np.arange(0, 7, 3)):
                 ## this box
                 t_box_arr = self.result[a:a+3, b:b+3].flatten()
-                for v in t_box_arr[t_box_arr != 0]:
-                    self.tmp[v-1,a:a+3, b:b+3] = 0
+                self.tmp[list(t_box_arr[t_box_arr != 0] -1),a:a+3, b:b+3] = 0
                 ## other box
                 self.block_box_by_tmp(a, b)
 
