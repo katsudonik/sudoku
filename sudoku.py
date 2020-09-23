@@ -76,7 +76,7 @@ class Sudoku:
                     self.tmp[n, t_a:t_a+3, block_c] = 0
                 c_cands_v[c_candidates[0]].append(n) # (for block this box)
 
-        # block this box (technic 4)
+        # block this box's other number (technic 4)
         for i in list(range(3)):
             ## block this box's row
             res_box_r = self.result[a+i, b:b+3]
