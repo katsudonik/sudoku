@@ -149,6 +149,8 @@ class Sudoku:
                 cand_indexes = pd.DataFrame(np.where(self.tmp[n] == 1))
                 print('cand_indexes:')
                 display(cand_indexes)
+                if cand_indexes.size == 0:
+                    continue
 
                 ## tmporary put (candidate:0)
                 self.put(cand_indexes[0][0], cand_indexes[0][1], n+1)
