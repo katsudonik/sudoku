@@ -18,7 +18,7 @@ importlib.reload(sudoku)
 # In[2]:
 
 
-result = np.loadtxt('input_data/test_106.csv', delimiter=',', dtype='int64')
+result = np.loadtxt('input_data/test_107.csv', delimiter=',', dtype='int64')
 sudoku = sudoku.Sudoku(result)
 
 
