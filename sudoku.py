@@ -135,60 +135,78 @@ class Sudoku:
             if self.result_zero_size() == before_size:
                 break
     
-    def empty_rectangle(self): # TODO test
-        while self.result_zero_size() != 0:
-            before_zero_size = self.result_zero_size()
-            list_n_sorted_by_cand_size = list(pd.DataFrame(
-                list(map(lambda n: self.tmp[n].sum(), list(np.arange(9))))).sort_values(0).index)
-            for n in list_n_sorted_by_cand_size:
-                result_bk = deepcopy(self.result)
-                tmp_bk = deepcopy(self.tmp)
+    def empty_rectangle(self):
+        before_zero_size = self.result_zero_size()
+        
+        result_bk = deepcopy(self.result)
+        tmp_bk = deepcopy(self.tmp)
+        
+        list_n_sorted_by_cand_size = list(pd.DataFrame(
+            list(map(lambda n: self.tmp[n].sum(), list(np.arange(9))))).sort_values(0).index)
+        for n in list_n_sorted_by_cand_size:
+            cand_indexes = np.array(np.where(self.tmp[n] == 1))
+            if len(cand_indexes[0]) == 0:
+                continue
 
-                print("before", n)
-                self.display_result()
-                cand_indexes = pd.DataFrame(np.where(self.tmp[n] == 1))
-                print('cand_indexes:')
-                display(cand_indexes)
-                if cand_indexes.size == 0:
-                    continue
-
-                ## tmporary put (candidate:0)
-                self.put(cand_indexes[0][0], cand_indexes[0][1], n+1)
-                self.repeat_put_in_fixed_places()
-                if self.result_zero_size() == 0:
-                    return True
-                dup_res = deepcopy(self.result)
-                ### rollback
-                self.result = deepcopy(result_bk)
-                self.tmp = deepcopy(tmp_bk)
-                print('dup_res 0:')
-                display(dup_res)
-
-                ## tmporary put (candidate: > 0) & update dup_res
-                for i in list(cand_indexes.transpose().index)[1:]:
-                    self.put(cand_indexes[i][0], cand_indexes[i][1], n+1)
+            # row
+            for r in list(set(cand_indexes[0])):
+                i = 0
+                for c in list(cand_indexes[:, np.where(cand_indexes[0] == r)[0]][1]):
+                    self.put(r, c, n+1)
                     self.repeat_put_in_fixed_places()
                     if self.result_zero_size() == 0:
                         return True
-                    print('result', i)
-                    display(self.result)
-                    ### update
-                    dup_res[~(dup_res == self.result)] = 0
+                    if i == 0:
+                        dup_res = deepcopy(self.result)
+                    else:
+                        ### update duplicate result
+                        dup_res[dup_res != self.result] = 0
                     ### rollback
                     self.result = deepcopy(result_bk)
                     self.tmp = deepcopy(tmp_bk)
-                    print('dup_res > 0:')
-                    display(dup_res)
+                    if np.where(dup_res != result_bk)[0].size == 0:
+                        break
+                    i += 1
                 self.result = dup_res
                 self.block_all()
-                print("after", n)
-                self.display_result()
                 self.repeat_put_in_fixed_places()
-            if self.result_zero_size() == before_zero_size:
-                break
+                result_bk = deepcopy(self.result)
+                tmp_bk = deepcopy(self.tmp)
+                if self.result_zero_size() < before_zero_size: # repeat
+                    return True
+
+            # column
+            for c in list(set(cand_indexes[1])):
+                i = 0
+                for r in list(cand_indexes[:, np.where(cand_indexes[1] == c)[0]][0]):
+                    self.put(r, c, n+1)
+                    self.repeat_put_in_fixed_places()
+                    if self.result_zero_size() == 0:
+                        return True
+                    if i == 0:
+                        dup_res = deepcopy(self.result)
+                    else:
+                        ### update duplicate result
+                        dup_res[dup_res != self.result] = 0
+                    ### rollback
+                    self.result = deepcopy(result_bk)
+                    self.tmp = deepcopy(tmp_bk)
+                    if np.where(dup_res != result_bk)[0].size == 0:
+                        break
+                    i += 1
+                self.result = dup_res
+                self.block_all()
+                self.repeat_put_in_fixed_places()
+                result_bk = deepcopy(self.result)
+                tmp_bk = deepcopy(self.tmp)
+                if self.result_zero_size() < before_zero_size: # repeat
+                    return True
 
     def exploratory_calc(self): # TODO use empty_rectangle?
         candidate_size_map = np.sum(self.tmp, axis=0)
+        if candidate_size_map.sum() == 0:
+            print('candidate size:0')
+            return False
         min_size = candidate_size_map[candidate_size_map != 0].min()
         min_size_indexes = pd.DataFrame(np.where(candidate_size_map == min_size))
         for i in list(min_size_indexes.transpose().index):
@@ -221,7 +239,11 @@ class Sudoku:
             self.check_result()
             print('complete!')
             return True
-        self.empty_rectangle()
+        while self.result_zero_size() != 0:
+            before_zero_size = self.result_zero_size()
+            self.empty_rectangle()
+            if self.result_zero_size() == 0 or self.result_zero_size() == before_zero_size:
+                break
         if self.result_zero_size() == 0:
             self.check_result()
             print('complete!')
@@ -283,4 +305,10 @@ class Sudoku:
 
     def display_by_color(self, df, subset):
         display( df.style.background_gradient(cmap='winter', subset=subset) )
+
+
+# In[ ]:
+
+
+
 
