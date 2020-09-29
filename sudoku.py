@@ -130,11 +130,11 @@ class Sudoku:
 
     def repeat_put_in_fixed_places(self):
         while self.result_zero_size() != 0:
-            before_size = self.result_zero_size()
+            before_zero_size = self.result_zero_size()
             self.put_in_fixed_places()
-            if self.result_zero_size() == before_size:
+            if self.result_zero_size() == 0 or self.result_zero_size() == before_zero_size:
                 break
-    
+
     def empty_rectangle(self):
         before_zero_size = self.result_zero_size()
         
