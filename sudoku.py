@@ -29,9 +29,7 @@ class Sudoku:
 
     def block_all(self):
         # exist place
-        non_zero_index = pd.DataFrame(np.where(self.result != 0))
-        for i in list(non_zero_index.transpose().index):
-            self.tmp[:, non_zero_index[i][0], non_zero_index[i][1]] = 0    
+        self.tmp[:, self.result != 0] = 0
         
         for i in list(np.arange(9)):
             # row
