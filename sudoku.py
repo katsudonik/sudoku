@@ -202,6 +202,13 @@ class Sudoku:
                 if self.result_zero_size() < before_zero_size: # repeat
                     return True
 
+    def repeat_empty_rectangle(self):
+        while self.result_zero_size() != 0:
+            before_zero_size = self.result_zero_size()
+            self.empty_rectangle()
+            if self.result_zero_size() == 0 or self.result_zero_size() == before_zero_size:
+                break
+    
     def exploratory_calc(self): # TODO use empty_rectangle?
         candidate_size_map = np.sum(self.tmp, axis=0)
         if candidate_size_map.sum() == 0:
@@ -216,6 +223,7 @@ class Sudoku:
                 self.repeat_put_in_fixed_places()
                 if self.result_zero_size() == 0:
                     return True
+#                 self.repeat_empty_rectangle()
                 if np.count_nonzero(self.tmp.flatten() != 0) != 0:
                     # NOTE: append savepoint
                     self.recursion_cnt += 1
@@ -239,11 +247,7 @@ class Sudoku:
             self.check_result()
             print('complete!')
             return True
-        while self.result_zero_size() != 0:
-            before_zero_size = self.result_zero_size()
-            self.empty_rectangle()
-            if self.result_zero_size() == 0 or self.result_zero_size() == before_zero_size:
-                break
+        self.repeat_empty_rectangle()
         if self.result_zero_size() == 0:
             self.check_result()
             print('complete!')
